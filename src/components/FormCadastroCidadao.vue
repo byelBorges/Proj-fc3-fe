@@ -48,6 +48,9 @@ export default {
                     console.log("Entrei then");
                     this.mensagem = `Cadastro concluído! Você será redirecionado para a tela de login.`;
                     this.exibirMessageBox = true;
+                    setTimeout(() => {
+                        window.location.href = "/login";
+                    }, 4000);
                 })
                 .catch(error => {
                     console.log("Entrei catch: " + error);
