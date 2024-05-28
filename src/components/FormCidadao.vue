@@ -2,48 +2,58 @@
   <div v-if="usuarioAutenticado" class="container">
     <p><a href="/login">Home</a></p>
     <h1>Módulo do Cidadão</h1>
-    <div class="divFormDenuncia">
+    <div class="form-denuncia">
       <form @submit.prevent="enviarDenuncia()">
-        <label for="titulo"></label>
-        <input id="titulo" v-model="titulo" type="text">
+        <div class="form-group">
+          <label for="titulo">Título:</label>
+          <input id="titulo" v-model="titulo" type="text">
+        </div>
 
-        <label for="texto"></label>
-        <input id="texto" v-model="texto" type="text">
+        <div class="form-group">
+          <label for="texto">Texto:</label>
+          <textarea class="texto" name="texto" rows="4" cols="50" v-model="texto"></textarea>
+        </div>
 
-        <label for="urgencia"></label>
-        <input id="urgencia" v-model="urgencia" type="text">
+        <div class="form-group">
+          <label for="urgencia">Urgência:</label>
+          <input id="urgencia" v-model="urgencia" type="text">
+        </div>
 
-        
-        <select v-model="this.orgaoSelecionado">
-          <!--<option v-for="orgao in this.listaOrgaos" :value="orgao.id">{{ orgao.nome }}</option>-->
-        </select>
+        <div class="form-group">
+          <label for="orgao">Órgão:</label>
+          <select v-model="orgaoSelecionado">
+            <option v-for="orgao in listaOrgaos" :value="orgao.id">{{ orgao.nome }}</option>
+          </select>
+        </div>
 
-        <label for="data"></label>
-        <input id="data" v-model="data" type="text">
+        <div class="form-group">
+          <label for="data">Data:</label>
+          <input id="data" v-model="data" type="date">
+        </div>
 
-        <label for="tipo"></label>
-        <input id="tipo" v-model="tipo" type="text">
-        <!-- Lembrar de enviar o cidadao logado tambem -->
+        <div class="form-group">
+          <label for="tipo">Tipo:</label>
+          <select v-model="tipoSelecionado">
+            <option v-for="tipo in listaTipos" :value="tipo.id">{{ tipo.nome }}</option>
+          </select>
+        </div>
+
+        <!-- Lembrar de enviar o cidadão logado também -->
+
+        <button class="btn-submit">Enviar Denúncia</button>
       </form>
     </div>
 
-    <div class="divListaDenuncias">
+    <div class="lista-denuncias">
 
-    </div>
-
-    <div class="opcoes">
-      <h3>Opções para visualizar as denúncias enviadas pelo Cidadão logado</h3>
-      <h3>Formulário para enviar uma nova denúncia</h3>
     </div>
   </div>
 </template>
 
 <script>
-
 import axios from 'axios';
 
 export default {
-  
   name: 'FormCidadao',
   data() {
     return {
@@ -51,7 +61,12 @@ export default {
       listaOrgaos: [],
       listaTipos: [],
       listaDenunciasCidadaoLogado: [],
-      titulo: '', texto: '', urgencia:'', orgaoSelecionado: '', data: '', tipo: '',
+      titulo: '',
+      texto: '',
+      urgencia: '',
+      orgaoSelecionado: '',
+      data: '',
+      tipo: '',
       urlBase: 'http://localhost:8080/apis/cidadao'
     };
   },
@@ -65,43 +80,67 @@ export default {
   },
   mounted() {
     //buscar Orgaos, tipos
-    //buscar Denuncias desse cidadao logado
+    //buscar Denuncias desse cidadão logado
     this.buscaOrgaos();
+    this.buscaTipos();
   },
   methods: {
     buscaOrgaos() {
       let token = localStorage.getItem('token');
-      axios.get(`http://localhost:8080/apis/cidadao/get-all-orgaos`,{
-        headers:{
-          'Authorization': token
-        }
-      })
+      axios
+        .get(`${this.urlBase}/get-all-orgaos`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
         .then(resposta => {
           this.listaOrgaos = resposta.data;
         })
-        .catch(erro =>{
-          this.listaOrgaos= [];
+        .catch(erro => {
+          this.listaOrgaos = [];
           console.log(erro);
-        })
+        });
     },
     buscaTipos() {
-
+      let token = localStorage.getItem('token');
+      axios
+        .get(`${this.urlBase}/get-all-tipos`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        .then(resposta => {
+          this.listaTipos = resposta.data;
+        })
+        .catch(erro => {
+          this.listaTipos = [];
+          console.log(erro);
+        });
     },
-    buscaDenunciasCidadaoLogado() {
-
+    enviarDenuncia() {
+      // Implemente a lógica de envio da denúncia aqui
+      axios.post('')
     }
-  },
+  }
 };
 </script>
 
 <style scoped>
 .container {
   max-width: 800px;
-  margin: auto;
-  padding: 20px;
+  width: 30%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.2);
+
+  margin: 30px 30px 30px 30px;
 }
 
-.divFormDenuncia {
+.form-denuncia {
   margin-bottom: 20px;
 }
 
@@ -110,4 +149,74 @@ export default {
   border-top: 1px solid #ccc;
   padding-top: 20px;
 }
+
+.input-wrapper {
+  display: flex;
+}
+
+.half-width {
+  width: 50%;
+  margin-right: 10px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.btn-submit {
+  width: 20%;
+  background-color: #0036e9;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-submit:hover {
+  background-color: #426eff;
+}
+
+
+
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 80%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.form-group select {
+  width: 80%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.texto {
+  height: 100px;
+  width: 80%;
+}
+
+.lista-denuncias {}
 </style>
