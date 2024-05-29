@@ -4,37 +4,43 @@
     <div>
       <h3>Opções para gerenciar o sistema</h3>
       <div class="admin-section">
-        <h4>Gerenciar Órgãos</h4>
+        <h4 class="labe">Gerenciar Órgãos</h4>
         <form @submit.prevent="salvarOrgao()">
-          <div class="form-group">
-            <label for="nomeOrgao">Nome do Órgão:</label>
-            <input id="nomeOrgao" v-model="orgao.nome" type="text">
+          <div class="form-group labe">
+            <div class="labeb">
+              <label for="nomeOrgao">Nome do Órgão:</label>
+              <input id="nomeOrgao" v-model="orgao.nome" type="text">
+            </div>
+            <p></p>
+            <button class="btn-submit">Salvar Órgão</button>
           </div>
-          <button class="btn-submit">Salvar Órgão</button>
         </form>
         <ul>
-          <li v-for="orgao in listaOrgaos" :key="orgao.id">
+          <li v-for="orgao in listaOrgaos" :key="orgao.id" class="labe">
             {{ orgao.nome }}
-            <button @click="editarOrgao(orgao)">Editar</button>
-            <button @click="deletarOrgao(orgao.id)">Deletar</button>
+            <button @click="editarOrgao(orgao)" class="btn-alter">Editar</button>&nbsp;
+            <button @click="deletarOrgao(orgao.id)" class="btn-delete">Deletar</button>
           </li>
         </ul>
       </div>
       
       <div class="admin-section">
-        <h4>Gerenciar Tipos de Problemas</h4>
+        <h4 class="labe">Gerenciar Tipos de Problemas</h4>
         <form @submit.prevent="salvarTipo()">
-          <div class="form-group">
-            <label for="nomeTipo">Nome do Tipo:</label>
-            <input id="nomeTipo" v-model="tipo.nome" type="text">
+          <div class="form-group labe">
+            <div class="labeb">
+              <label for="nomeTipo">Nome do Tipo:</label>
+              <input id="nomeTipo" v-model="tipo.nome" type="text">
+            </div>
+            <p></p>
+            <button class="btn-submit">Salvar Tipo</button>
           </div>
-          <button class="btn-submit">Salvar Tipo</button>
         </form>
         <ul>
-          <li v-for="tipo in listaTipos" :key="tipo.id">
+          <li v-for="tipo in listaTipos" :key="tipo.id" class="labe">
             {{ tipo.nome }}
-            <button @click="editarTipo(tipo)">Editar</button>
-            <button @click="deletarTipo(tipo.id)">Deletar</button>
+            <button @click="editarTipo(tipo)" class="btn-alter">Editar</button>&nbsp;
+            <button @click="deletarTipo(tipo.id)" class="btn-delete">Deletar</button>
           </li>
         </ul>
       </div>
@@ -42,9 +48,9 @@
       <div class="admin-section">
         <h4>Gerenciar Denúncias</h4>
         <ul>
-          <li v-for="denuncia in listaDenuncias" :key="denuncia.id">
+          <li v-for="denuncia in listaDenuncias" :key="denuncia.id" class="labe">
             {{ denuncia.titulo }}
-            <button @click="deletarDenuncia(denuncia.id)">Deletar</button>
+            <button @click="deletarDenuncia(denuncia.id)" class="btn-delete">Deletar</button>
             <form @submit.prevent="darFeedback(denuncia.id)">
               <input v-model="denuncia.feedback" type="text" placeholder="Feedback">
               <button type="submit">Enviar Feedback</button>
@@ -191,7 +197,7 @@ export default {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
-  background-color: orange;
+  background-color: #006e39;
   border-radius: 8px;
 }
 
@@ -208,6 +214,40 @@ export default {
   margin-bottom: 5px;
 }
 
+.btn-delete {
+  background-color: #830303;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-alter {
+  background-color: #f87603;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.labe {
+  background-color: white;
+  color: rgb(0, 0, 0);
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.labeb {
+  background-color: black;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
 .btn-submit {
   background-color: #0036e9;
   color: white;
@@ -218,6 +258,20 @@ export default {
 }
 
 .btn-submit:hover {
+  background-color: #426eff;
+}
+
+input[type=submit] {
+  width: 100%;
+  background-color: #0036e9;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+input[type=submit]:hover {
   background-color: #426eff;
 }
 </style>
