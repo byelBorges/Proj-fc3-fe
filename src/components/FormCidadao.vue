@@ -22,7 +22,7 @@
         <div class="form-group">
           <label for="orgao">Órgão:</label>
           <select v-model="orgaoSelecionado">
-            <option v-for="orgao in listaOrgaos" :value="orgao.id">{{ orgao.nome }}</option>
+            <option v-for="orgao in listaOrgaos" :key="orgao.id" :value="orgao.id">{{ orgao.nome }}</option>
           </select>
         </div>
 
@@ -34,7 +34,7 @@
         <div class="form-group">
           <label for="tipo">Tipo:</label>
           <select v-model="tipoSelecionado">
-            <option v-for="tipo in listaTipos" :value="tipo.id">{{ tipo.nome }}</option>
+            <option v-for="tipo in listaTipos" :key="tipo.id" :value="tipo.id">{{ tipo.nome }}</option>
           </select>
         </div>
 
