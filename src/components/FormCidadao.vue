@@ -44,17 +44,21 @@
       </form>
     </div>
 
-    <div class="lista-denuncias">
-      <div v-for="denuncia in listaDenunciasCidadaoLogado" :key="denuncia.id" class="denuncia">
-        <h3>{{ denuncia.titulo }}</h3>
-        <p><strong>Texto:</strong> {{ denuncia.texto }}</p>
-        <p><strong>Urgência:</strong> {{ denuncia.urgencia }}</p>
-        <p><strong>Data:</strong> {{ denuncia.data }}</p>
-        <!--<p><strong>Órgão:</strong> {{ denuncia.orgao.nome }}</p>
-        <p><strong>Tipo:</strong> {{ denuncia.tipo.nome }}</p>-->
+    <div class="suas-denuncias">
+      <div class="lista-denuncias">
+        <div v-for="denuncia in listaDenunciasCidadaoLogado" :key="denuncia.id" class="denuncia">
+          <h3>{{ denuncia.titulo }}</h3>
+          <p><strong>Texto:</strong> {{ denuncia.texto }}</p>
+          <p><strong>Urgência:</strong> {{ denuncia.urgencia }}</p>
+          <p><strong>Data:</strong> {{ denuncia.data.split("T")[0] }}</p>
+          <p><strong>Órgão:</strong> {{ denuncia.orgao.nome }}</p>
+        <p><strong>Tipo:</strong> {{ denuncia.tipo.nome }}</p>
+        </div>
       </div>
     </div>
   </div>
+
+
   <message-box :mensagem="mensagem" v-if="exibirMessageBox"></message-box>
 </template>
 
@@ -109,7 +113,7 @@ export default {
     buscaDenunciaUsuario() {
 
       axios.get(`${this.urlBase}/get-denuncias-cidadao?userId=${this.usuarioLogado.id}`, {
-        headers:{
+        headers: {
           'Authorization': localStorage.getItem("token")
         }
       })
@@ -176,6 +180,7 @@ export default {
           this.mensagem = 'Denuncia enviada com êxito';
           this.exibirMessageBox = true;
           this.limparForm();
+          this.buscaDenunciaUsuario();
         })
         .catch(erro => {
           this.mensagem = erro;
@@ -292,7 +297,17 @@ export default {
   width: 80%;
 }
 
+.suas-denuncias{
+  margin-top: 20px;
+}
+
 .lista-denuncias {
   background-color: rgb(185, 185, 185);
+  border: 2px solid black;
+  margin-top: 20px;
+}
+
+.denuncia{
+  border: 2px solid black;
 }
 </style>
