@@ -46,14 +46,14 @@
       </div>
       
       <div class="admin-section">
-        <h4>Gerenciar Denúncias</h4>
+        <h4 class="labe">Gerenciar Denúncias</h4>
         <ul>
           <li v-for="denuncia in listaDenuncias" :key="denuncia.id" class="labe">
             {{ denuncia.titulo }}
             <button @click="deletarDenuncia(denuncia.id)" class="btn-delete">Deletar</button>
             <form @submit.prevent="darFeedback(denuncia.id)">
-              <input v-model="denuncia.feedback" type="text" placeholder="Feedback">
-              <button type="submit">Enviar Feedback</button>
+              <input v-model="denuncia.feedback" type="text" placeholder="Feedback">&nbsp;
+              <button class="btn-submit">Enviar Feedback</button>
             </form>
           </li>
         </ul>
@@ -177,10 +177,13 @@ export default {
     },
     darFeedback(id) {
       const denuncia = this.listaDenuncias.find(d => d.id === id);
-      const feedback = denuncia.feedback;
-      
+      const feedbackdata={
+        id: null,
+        texto: denuncia.feedback,
+        denuncia: denuncia.id
+      };
       axios
-        .post(`${this.urlBase}/add-feedback`, { denunciaId: id, feedback })
+        .post(`${this.urlBase}/add-feedback`, feedbackdata)
         .then(() => {
           this.buscarDenuncias();
         })
@@ -197,7 +200,8 @@ export default {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
-  background-color: #006e39;
+  background-color: #0036e9;
+  color:black;
   border-radius: 8px;
 }
 
@@ -271,6 +275,19 @@ input[type=submit] {
   border-radius: 4px;
   cursor: pointer;
 }
+
+input,
+select {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin-bottom: 25px;
+}
+
 input[type=submit]:hover {
   background-color: #426eff;
 }
