@@ -16,13 +16,13 @@
 
         <div class="form-group">
           <label for="urgencia">Urgência:</label>
-          <input id="urgencia" v-model="urgencia" type="text">
+          <input id="urgencia" v-model="urgencia" type="number" min="1" max="5">
         </div>
 
         <div class="form-group">
           <label for="orgao">Órgão:</label>
           <select v-model="orgaoSelecionado">
-            <option v-for="orgao in listaOrgaos" :value="orgao.id">{{ orgao.nome }}</option>
+            <option v-for="orgao in listaOrgaos" :key="orgao.id" :value="orgao.id">{{ orgao.nome }}</option>
           </select>
         </div>
 
@@ -34,7 +34,7 @@
         <div class="form-group">
           <label for="tipo">Tipo:</label>
           <select v-model="tipoSelecionado">
-            <option v-for="tipo in listaTipos" :value="tipo.id">{{ tipo.nome }}</option>
+            <option v-for="tipo in listaTipos" :key="tipo.id" :value="tipo.id">{{ tipo.nome }}</option>
           </select>
         </div>
 
@@ -45,28 +45,46 @@
     </div>
 
     <div class="lista-denuncias">
-
+      <div v-for="denuncia in listaDenunciasCidadaoLogado" :key="denuncia.id" class="denuncia">
+        <h3>{{ denuncia.titulo }}</h3>
+        <p><strong>Texto:</strong> {{ denuncia.texto }}</p>
+        <p><strong>Urgência:</strong> {{ denuncia.urgencia }}</p>
+        <p><strong>Data:</strong> {{ denuncia.data }}</p>
+        <!--<p><strong>Órgão:</strong> {{ denuncia.orgao.nome }}</p>
+        <p><strong>Tipo:</strong> {{ denuncia.tipo.nome }}</p>-->
+      </div>
     </div>
   </div>
+  <message-box :mensagem="mensagem" v-if="exibirMessageBox"></message-box>
 </template>
 
 <script>
 import axios from 'axios';
+import MessageBox from './MessageBox.vue';
 
 export default {
+  components: {
+    MessageBox
+  },
   name: 'FormCidadao',
   data() {
+    let hoje = new Date();
+    hoje.setDate(hoje.getDate() - 1);
+    hoje = hoje.toISOString().slice(0, 10);
     return {
       usuarioAutenticado: false,
+      exibirMessageBox: false,
+      mensagem: '',
       listaOrgaos: [],
       listaTipos: [],
       listaDenunciasCidadaoLogado: [],
       titulo: '',
       texto: '',
-      urgencia: '',
+      urgencia: 1,
       orgaoSelecionado: '',
-      data: '',
-      tipo: '',
+      data: hoje,
+      tipoSelecionado: '',
+      usuarioLogado: this.getUsuario(localStorage.getItem("token")),
       urlBase: 'http://localhost:8080/apis/cidadao'
     };
   },
@@ -83,43 +101,99 @@ export default {
     //buscar Denuncias desse cidadão logado
     this.buscaOrgaos();
     this.buscaTipos();
+
+
+    this.buscaDenunciaUsuario();
   },
   methods: {
-    buscaOrgaos() {
-      let token = localStorage.getItem('token');
-      axios
-        .get(`${this.urlBase}/get-all-orgaos`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
+    buscaDenunciaUsuario() {
+
+      axios.get(`${this.urlBase}/get-denuncias-cidadao?userId=${this.usuarioLogado.id}`, {
+        headers:{
+          'Authorization': localStorage.getItem("token")
+        }
+      })
         .then(resposta => {
-          this.listaOrgaos = resposta.data;
+          this.listaDenunciasCidadaoLogado = resposta.data;
+
         })
         .catch(erro => {
-          this.listaOrgaos = [];
-          console.log(erro);
+          this.mensagem = erro;
+          this.exibirMessageBox = true;
+        })
+    },
+    buscaOrgaos() {
+      let token = localStorage.getItem('token');
+      axios.get(`${this.urlBase}/get-all-orgaos`, {
+        headers: {
+          Authorization: `${token}`
+        }
+      })
+        .then(resposta => {
+          this.listaOrgaos = resposta.data;
+          this.orgaoSelecionado = this.listaOrgaos[0].id;//select aparece já selecionado
+        })
+        .catch(erro => {
+          this.mensagem = erro;
+          this.exibirMessageBox = true;
         });
     },
     buscaTipos() {
       let token = localStorage.getItem('token');
-      axios
-        .get(`${this.urlBase}/get-all-tipos`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
+      axios.get(`${this.urlBase}/get-all-tipos`, {
+        headers: {
+          Authorization: `${token}`
+        }
+      })
         .then(resposta => {
           this.listaTipos = resposta.data;
+          this.tipoSelecionado = this.listaTipos[0].id;
         })
         .catch(erro => {
-          this.listaTipos = [];
-          console.log(erro);
+          this.mensagem = erro;
+          this.exibirMessageBox = true;
         });
     },
     enviarDenuncia() {
       // Implemente a lógica de envio da denúncia aqui
-      axios.post('')
+      let token = localStorage.getItem("token");
+      let user = this.getUsuario(token);
+      let denuncia = {
+        titulo: this.titulo,
+        texto: this.texto,
+        urgencia: this.urgencia,
+        data: this.data,
+        orgaoId: this.orgaoSelecionado,
+        tipoId: this.tipoSelecionado,
+        usuarioId: user.id
+      };
+      axios.post(`${this.urlBase}/add-denuncia`, denuncia, {
+        headers: {
+          'Authorization': token
+        }
+      })
+        .then(resposta => {
+          this.mensagem = 'Denuncia enviada com êxito';
+          this.exibirMessageBox = true;
+          this.limparForm();
+        })
+        .catch(erro => {
+          this.mensagem = erro;
+          this.exibirMessageBox = true;
+        })
+    },
+    getUsuario(token) {
+      const base64Url = token.split('.')[1];
+      if (base64Url) {
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const payload = JSON.parse(window.atob(base64));
+        return payload;
+      }
+    },
+    limparForm() {
+      this.titulo = '';
+      this.texto = '';
+      this.urgencia = 1;
     }
   }
 };
@@ -214,9 +288,11 @@ export default {
 }
 
 .texto {
-  height: 100px;
+  height: 60px;
   width: 80%;
 }
 
-.lista-denuncias {}
+.lista-denuncias {
+  background-color: rgb(185, 185, 185);
+}
 </style>
