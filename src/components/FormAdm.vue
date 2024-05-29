@@ -77,6 +77,14 @@ export default {
       urlBase: 'http://localhost:8080/apis/adm'
     };
   },
+  beforeMount() {
+    const token = localStorage.getItem("token");
+    if (token != null) {
+      this.usuarioAutenticado = true;
+    } else {
+      window.location.replace("/login");
+    }
+  },
   mounted() {
     this.buscarOrgaos();
     this.buscarTipos();
@@ -95,7 +103,11 @@ export default {
     },
     buscarTipos() {
       axios
-        .get(`${this.urlBase}/get-all-tipos`)
+        .get(`${this.urlBase}/get-all-tipos`, {
+        headers: {
+          'Authorization': localStorage.getItem("token")
+        }
+      })
         .then(resposta => {
           this.listaTipos = resposta.data;
         })
@@ -105,7 +117,11 @@ export default {
     },
     buscarDenuncias() {
       axios
-        .get(`${this.urlBase}/get-all-denuncias`)
+        .get(`${this.urlBase}/get-all-denuncias`, {
+        headers: {
+          'Authorization': localStorage.getItem("token")
+        }
+      })
         .then(resposta => {
           this.listaDenuncias = resposta.data;
         })
@@ -117,7 +133,11 @@ export default {
       const metodo = this.orgao.id ? 'put' : 'post';
       const url = this.orgao.id ? `${this.urlBase}/alterar-orgao` : `${this.urlBase}/add-orgao`;
       
-      axios[metodo](url, this.orgao)
+      axios[metodo](url, this.orgao, {
+        headers: {
+          'Authorization': localStorage.getItem("token")
+        }
+      })
         .then(() => {
           this.buscarOrgaos();
           this.orgao = { id: null, nome: '' };
@@ -131,7 +151,11 @@ export default {
     },
     deletarOrgao(id) {
       axios
-        .delete(`${this.urlBase}/del-orgao-id/${id}`)
+        .delete(`${this.urlBase}/del-orgao-id/${id}`, {
+        headers: {
+          'Authorization': localStorage.getItem("token")
+        }
+      })
         .then(() => {
           this.buscarOrgaos();
         })
@@ -143,7 +167,11 @@ export default {
       const metodo = this.tipo.id ? 'put' : 'post';
       const url = this.tipo.id ? `${this.urlBase}/alterar-tipo` : `${this.urlBase}/add-tipo`;
       
-      axios[metodo](url, this.tipo)
+      axios[metodo](url, this.tipo, {
+        headers: {
+          'Authorization': localStorage.getItem("token")
+        }
+      })
         .then(() => {
           this.buscarTipos();
           this.tipo = { id: null, nome: '' };
@@ -157,7 +185,11 @@ export default {
     },
     deletarTipo(id) {
       axios
-        .delete(`${this.urlBase}/del-tipo-id/${id}`)
+        .delete(`${this.urlBase}/del-tipo-id/${id}`, {
+        headers: {
+          'Authorization': localStorage.getItem("token")
+        }
+      })
         .then(() => {
           this.buscarTipos();
         })
@@ -167,7 +199,11 @@ export default {
     },
     deletarDenuncia(id) {
       axios
-        .delete(`${this.urlBase}/del-denuncia-id/${id}`)
+        .delete(`${this.urlBase}/del-denuncia-id/${id}`, {
+        headers: {
+          'Authorization': localStorage.getItem("token")
+        }
+      })
         .then(() => {
           this.buscarDenuncias();
         })
@@ -183,7 +219,11 @@ export default {
         denuncia: denuncia.id
       };
       axios
-        .post(`${this.urlBase}/add-feedback`, feedbackdata)
+        .post(`${this.urlBase}/add-feedback`, feedbackdata, {
+        headers: {
+          'Authorization': localStorage.getItem("token")
+        }
+      })
         .then(() => {
           this.buscarDenuncias();
         })
